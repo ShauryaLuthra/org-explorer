@@ -14,7 +14,7 @@ let zoomBehavior = null // The d3 zoom object, created once the page element exi
 onMounted(() => { // The elements exist now, so d3 can attach to them.
   zoomBehavior = zoom().scaleExtent([0.1, 2]).on('zoom', (event) => { transform.value = event.transform }) // Allow 10%-200% zoom; on every pan/zoom, remember the new transform.
   select(viewport.value).call(zoomBehavior).on('dblclick.zoom', null) // Attach to the viewport; turn off double-click zoom (it clashes with clicking cards).
-  nextTick(reset) // After the first draw, place the tree at the top centre.
+  nextTick(() => { reset(); if (highlightedId.value) panTo(highlightedId.value) }) // After the first draw, centre the tree, or pan to a person if we arrived via "View in org chart".
 }) // End of onMounted.
 
 /**
@@ -43,6 +43,14 @@ function fit() { // Fit button.
 watch(highlightedId, async (id) => { // When search highlights someone...
   if (!id) return // ...(ignore the highlight being cleared)...
   await nextTick() // ...wait for Vue to draw the newly expanded path...
+  panTo(id) // ...then pan to their card.
+}) // End of the highlight watcher.
+
+/**
+ * Pan and zoom so one person's card is centred in the visible area.
+ * @param {string} id - Whose card.
+ */
+function panTo(id) { // Used by the watcher and on first mount.
   const card = content.value.querySelector(`[data-id="${CSS.escape(id)}"]`) // ...find their card...
   if (!card) return // ...(not drawn: nothing to do)...
   const k = Math.max(transform.value.k, 0.8) // ...zoom in to at least 80% so it's readable...
@@ -52,7 +60,7 @@ watch(highlightedId, async (id) => { // When search highlights someone...
   const y = (box.top - tree.top + box.height / 2) / transform.value.k // ...same vertically...
   const visibleWidth = viewport.value.clientWidth - (selectedId.value ? 384 : 0) // ...the drawer (384 px wide) covers the right side when open...
   moveTo(visibleWidth / 2 - x * k, viewport.value.clientHeight / 3 - y * k, k) // ...so centre it in the uncovered area, a third of the way down.
-}) // End of the highlight watcher.
+} // End of panTo.
 </script> <!-- End of the JavaScript part. -->
 
 <template> <!-- What the canvas shows. -->
