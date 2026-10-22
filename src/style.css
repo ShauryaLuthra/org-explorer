@@ -1,1 +1,13 @@
 @import "tailwindcss"; /* Pulls in Tailwind. When the app runs, the Tailwind plugin swaps this line for the real CSS of every Tailwind class name we used. */
+
+/* Org chart connector lines. Each team is a <ul> row and each person an <li>; the lines are borders on empty ::before/::after pieces. */
+.org-tree, .org-tree ul { display: flex; justify-content: center; } /* Every row lays its people side by side, centred under the manager. */
+.org-tree ul { position: relative; padding-top: 24px; } /* Team rows leave 24px above them for lines, and anchor the vertical line below. */
+.org-tree li { position: relative; display: flex; flex-direction: column; align-items: center; padding: 24px 8px 0; } /* A person: card on top, team underneath, centred; room for lines and a gap to neighbours. */
+.org-tree li::before, .org-tree li::after { content: ''; position: absolute; top: 0; right: 50%; width: 50%; height: 24px; border-top: 1px solid var(--color-slate-300); } /* Two half-width bars above each person form the horizontal line across the team. */
+.org-tree li::after { right: auto; left: 50%; border-left: 1px solid var(--color-slate-300); } /* The right half also draws the short vertical drop down to the card. */
+.org-tree li:only-child::before, .org-tree li:only-child::after { display: none; } /* A lone child needs no horizontal bar. */
+.org-tree li:only-child { padding-top: 0; } /* ...and no extra space for it. */
+.org-tree li:first-child::before, .org-tree li:last-child::after { border: 0 none; } /* The bar must not stick out past the first or last person. */
+.org-tree li:last-child::before { border-right: 1px solid var(--color-slate-300); } /* The last person's vertical drop comes from the left half instead. */
+.org-tree ul::before { content: ''; position: absolute; top: 0; left: 50%; height: 24px; border-left: 1px solid var(--color-slate-300); } /* Vertical line from the manager's card down to the team's bar. */

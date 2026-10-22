@@ -4,6 +4,7 @@ import { shallowRef, ref, reactive, markRaw } from 'vue' // Vue's tools for valu
 import { fetchBundledCsv, parseCsv } from '../data/loadCsv.js' // Get + parse the CSV.
 import { buildTree } from '../data/buildTree.js' // Rows -> tree.
 import { aggregate } from '../data/aggregate.js' // Tree -> counts and costs.
+import { assignDepartmentColors } from '../data/departmentColors.js' // Department -> colour, set once per file.
 
 const FIRST_CHILDREN = 12 // How many reports a card shows before "Show more" (wide teams have up to 78).
 const MORE_CHILDREN = 24 // How many more each "Show more" click reveals.
@@ -49,6 +50,7 @@ async function load(getText) { // Shared by the bundled file and Upload CSV, so 
     const order = aggregate(root) // 4. Tree -> numbers.
     const t4 = performance.now() // Time after aggregating.
     for (const person of order) markRaw(person) // Tell Vue never to watch inside these 40k objects: saves lots of memory and time.
+    assignDepartmentColors(order.map((p) => p.department)) // Give each department its colour for this file.
     const searchTexts = order.map((p) => `${p.name} ${p.title}`.toLowerCase()) // Lower-cased once, so each search is a quick text check.
     org.value = { root, byId, order, issues, parseErrors: errors, searchTexts } // Swap in the new data in one go; the screen redraws once.
     timings.value = { read: t1 - t0, parse: t2 - t1, build: t3 - t2, aggregate: t4 - t3, total: t4 - t0 } // Store the stage times.
@@ -156,6 +158,7 @@ export function useOrg() { // Every component calls this; they all get the same 
     loadBundled: () => load(fetchBundledCsv), // Load the CSV that ships with the app.
     loadFile: (file) => load(() => file.text()), // Load a user-chosen file (Upload CSV) through the same pipeline.
     toggle, visibleCount, showMore, expandPathTo, revealPerson, search, setTab, // Actions.
+    select: (id) => { selectedId.value = id }, // Open the drawer for a person (null closes it).
     collapseAll: resetView, // "Collapse all" = back to the starting view.
   } // End of the returned object.
 } // End of useOrg.
