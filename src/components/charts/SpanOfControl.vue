@@ -16,7 +16,8 @@ const managers = computed(() => props.people.filter((p) => !p.isLeaf)) // Only p
 const bars = computed(() => BUCKETS.map((b) => ({ ...b, count: managers.value.filter((m) => m.children.length >= b.min && m.children.length <= b.max).length }))) // How many managers fall in each group.
 const y = computed(() => scaleLinear().domain([0, Math.max(...bars.value.map((b) => b.count), 1)]).range([0, HEIGHT - 40])) // Count -> bar height.
 const narrow = computed(() => managers.value.filter((m) => m.children.length <= 2)) // Managers with only 1-2 reports.
-const title = computed(() => `${formatCount(narrow.value.length)} of ${formatCount(managers.value.length)} managers (${((narrow.value.length / Math.max(managers.value.length, 1)) * 100).toFixed(0)}%) have only 1–2 direct reports`) // The finding.
+const busiest = computed(() => bars.value.reduce((best, b) => (b.count > best.count ? b : best))) // The group holding the most managers, e.g. "3–5".
+const title = computed(() => `${formatCount(busiest.value.count)} of ${formatCount(managers.value.length)} managers have ${busiest.value.label} direct reports`) // The finding: the normal team size.
 
 const sortKey = ref('totalCost') // Which column the table is sorted by.
 const sortDesc = ref(true) // Biggest first?

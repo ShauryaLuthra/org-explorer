@@ -35,7 +35,7 @@ describe('aggregate: bundled CSV', () => { // Works whatever file is at this pat
 
   it('root total cost = all salaries minus the root\'s own', () => { // Total cost excludes own salary.
     const allSalaries = [...byId.values()].reduce((sum, p) => sum + p.salary, 0) // Sum of every cleaned salary.
-    expect(root.totalCost).toBe(allSalaries - root.salary) // Everyone below the root.
+    expect(root.totalCost).toBeCloseTo(allSalaries - root.salary, 2) // Everyone below the root, equal to the cent (decimal salaries can be off by ~0.000001).
   }) // End of test.
 
   it('every node: totalCost = mgmt + IC, and nonLeafDesc <= desc', () => { // Invariants that must hold everywhere.
@@ -52,6 +52,7 @@ describe('aggregate: bundled CSV', () => { // Works whatever file is at this pat
     updateSalary(leaf, 1) // Cut the IC's pay.
     const fast = order.map((p) => [p.mgmtCost, p.icCost, p.totalCost]) // Snapshot after the shortcut.
     aggregate(root) // Recompute everything from scratch.
-    expect(order.map((p) => [p.mgmtCost, p.icCost, p.totalCost])).toEqual(fast) // Must match exactly.
+    const full = order.map((p) => [p.mgmtCost, p.icCost, p.totalCost]) // Snapshot after the full recompute.
+    full.forEach((row, i) => row.forEach((value, j) => expect(value).toBeCloseTo(fast[i][j], 2))) // Every number must match the shortcut's to the cent.
   }) // End of test.
 }) // End of the bundled-CSV group.

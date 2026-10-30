@@ -7,7 +7,7 @@ import { MGMT_COLOUR, IC_COLOUR } from './chartColors.js' // Series colours.
 
 const props = defineProps({ people: { type: Array, required: true } }) // Everyone in the current filter.
 const WIDTH = 640 // Drawing width (the SVG scales to fit its box).
-const LABEL = 170 // Space on the left for department names.
+const LABEL = 210 // Space on the left for department names (fits the longest, e.g. "Sales and Business Development").
 const ROW = 30 // Height of one bar row.
 
 const rows = computed(() => { // One row per department.

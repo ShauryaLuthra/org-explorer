@@ -7,7 +7,7 @@ export const COLUMNS = { // "export" lets other files import this; "const" means
   title: 'Job Title', // Job title, shown under the name and also searched.
   department: 'Department', // Drives the coloured department pill and the department filter.
   location: 'Location', // City, e.g. "Toronto, Canada", shown as a pill.
-  level: 'Level', // Seniority number from the file: display only. We never use it for maths (we compute depth ourselves).
-  managerId: 'Manager Id', // The boss's Employee Id, empty for the CEO. This one column is how the whole tree gets built.
+  level: 'level', // Seniority number from the file: display only. We never use it for maths (we compute depth ourselves).
+  managerId: 'Manager', // The boss's Employee Id, empty for the CEO. This one column is how the whole tree gets built.
   salary: 'Salary', // Yearly salary. Every cost number in the app is built from this.
 } // End of the mapping object.
