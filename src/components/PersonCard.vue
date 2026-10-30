@@ -46,7 +46,15 @@ const icCount = computed(() => props.person.desc - props.person.nonLeafDesc)
       <div class="flex justify-between"><dt class="text-slate-500">IC cost</dt><dd class="font-medium text-slate-900">{{ formatMoney(person.icCost) }}</dd></div>
       <div class="flex justify-between"><dt class="text-slate-500">Total cost</dt><dd class="font-semibold text-slate-900">{{ formatMoney(person.totalCost) }}</dd></div>
       <div class="flex justify-between">
-        <dt class="text-slate-500">Mgmt cost ratio <span class="cursor-help text-slate-400" title="Management cost ÷ IC cost">ⓘ</span></dt>
+        <dt class="text-slate-500">
+          Mgmt cost ratio
+          <!-- A CSS tooltip, not title="", because native tooltips are slow to appear and don't show up in screen recordings. -->
+          <span class="group relative cursor-help text-slate-400" aria-label="Management cost divided by IC cost">ⓘ
+            <span role="tooltip" class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-56 -translate-x-1/2 rounded-lg bg-slate-900 px-3 py-2 text-xs leading-snug text-white shadow-lg group-hover:block">
+              Management cost ÷ IC cost<br />{{ formatMoney(person.mgmtCost) }} ÷ {{ formatMoney(person.icCost) }} = {{ formatRatio(person.ratio) }}
+            </span>
+          </span>
+        </dt>
         <dd class="font-medium text-slate-900">{{ formatRatio(person.ratio) }}</dd>
       </div>
       <div class="flex justify-between gap-2"><dt class="text-slate-500">Mgmt : IC headcount</dt><dd class="whitespace-nowrap font-medium text-slate-900">{{ formatCount(person.nonLeafDesc) }} : {{ formatCount(icCount) }}</dd></div>
