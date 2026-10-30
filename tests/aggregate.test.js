@@ -24,6 +24,28 @@ describe('aggregate: worked example', () => {
   })
 })
 
+describe('aggregate: edge cases', () => {
+  it('gives a lone person zero counts and no ratios', () => {
+    const { root } = buildTree([row('A', '', '100')])
+    aggregate(root)
+    expect([root.desc, root.nonLeafDesc, root.totalCost]).toEqual([0, 0, 0])
+    expect([root.ratio, root.headcountRatio]).toEqual([null, null])
+  })
+
+  it('returns a null ratio, not Infinity, when IC cost is 0', () => {
+    const { root } = buildTree([row('A', '', '100'), row('B', 'A', '50'), row('C', 'B', '0')])
+    aggregate(root)
+    expect(root.mgmtCost).toBe(50)
+    expect(root.ratio).toBeNull()
+  })
+
+  it('does not count placeholder nodes as people', () => {
+    const { root } = buildTree([row('A', '', '1'), row('B', 'ZZZ', '1')])
+    aggregate(root)
+    expect(root.desc).toBe(2) // Giga Corp root > A and Unassigned > B: only A and B are people.
+  })
+})
+
 describe('aggregate: bundled CSV', () => {
   const { rows } = parseCsv(readFileSync('public/data/giga-corp.csv', 'utf8'))
   const { root, byId } = buildTree(rows)

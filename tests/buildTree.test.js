@@ -42,6 +42,22 @@ describe('buildTree', () => {
     expect(issueTypes(result).filter((type) => type === 'invalid-salary').length).toBe(2)
   })
 
+  it('rejects a file with no people', () => {
+    expect(() => buildTree([])).toThrow('No people found')
+  })
+
+  it('treats a negative salary as invalid', () => {
+    const result = buildTree([row('A', '', '-5000')])
+    expect(result.byId.get('A').salary).toBe(0)
+    expect(issueTypes(result)).toContain('invalid-salary')
+  })
+
+  it('breaks a self-loop (a person listed as their own manager)', () => {
+    const result = buildTree([row('A', 'A', '1')])
+    expect(issueTypes(result)).toContain('cycle')
+    expect(result.byId.get('A').parent.id).toBe(UNASSIGNED_ID)
+  })
+
   it('keeps the first row when an ID is duplicated', () => {
     const result = buildTree([row('A', '', '1'), row('B', 'A', '5'), row('B', 'A', '9')])
     expect(result.byId.get('B').salary).toBe(5)
