@@ -10,7 +10,7 @@ An interactive org chart and cost-analysis tool for Giga Corp's 40,000 employees
 ```bash
 npm install
 npm run dev     # app at http://localhost:5173 (Node 18+)
-npm test        # 12 tests (Vitest 4 needs Node 20+)
+npm test        # 27 tests (Vitest 4 needs Node 20+)
 npm run build   # production build in dist/
 ```
 
@@ -49,6 +49,33 @@ npm run build   # production build in dist/
 **Data handling**
 - **Upload CSV** loads any file with the same columns.
 - A data-quality badge reports anything the loader had to fix.
+
+## Architecture
+
+```
+src/
+  data/               Pure JavaScript, no Vue or DOM: CSV parsing, tree building, aggregation, formatting
+  composables/        useOrg.js, the single shared state: loads data, holds UI state, exposes actions
+  components/         Cards, canvas, phone list, drawer, search, header
+  components/charts/  Hand-built SVG charts (d3-scale for the maths, Vue for the rendering)
+  views/              The two tabs
+tests/                Vitest unit tests for the data layer, where the logic lives
+```
+
+**Data flow:** CSV text → `parseCsv` → `buildTree` → `aggregate` → `useOrg` (a non-reactive tree plus small reactive UI state) → components.
+
+- **Separation of concerns:** all business logic sits in `src/data` as plain functions. It is unit-tested directly in Node and could run unchanged on a server. Components only read the computed numbers and render them.
+- **No Pinia or vue-router:** one composable is enough state management for two views, and the active tab lives in the URL hash.
+
+## Error handling
+
+| What goes wrong | What happens |
+|---|---|
+| Bad rows (duplicate ID, unknown manager, several roots, reporting loop, blank or negative salary) | The row is kept and fixed, and the data-quality badge lists every fix. Nothing crashes. |
+| An uploaded file with the wrong columns | The error names exactly which columns are missing. The current data stays on screen with a dismissible banner. |
+| The bundled file can't be fetched | A readable error page with the HTTP status. |
+| A division by zero (no ICs below someone) | The ratio is null and shows "–", never Infinity or NaN. |
+| Money at a unit boundary | It rolls over cleanly: $999,999 shows as $1M, not $1000K. |
 
 ## Data
 
@@ -93,11 +120,14 @@ Each sum reuses the children's already-computed values, so every value is comput
 
 The 40,000-node tree is stored with `shallowRef`/`markRaw`, so Vue does not track every object. Only small UI state is reactive (the expanded set, search text, selection, tab and filter), and only expanded cards are rendered.
 
-**Tests (Vitest, 12 passing):**
-- The worked example A/B/C/D/E, checked by hand.
-- Every bad-data case.
-- Invariants on the real file: root descendants = n − 1, root total = sum of salaries − root salary, and total = management + IC with non-leaf ≤ descendants for every node.
-- `updateSalary` equals a full recompute.
+**Tests (Vitest, 27 passing, in 4 files):**
+- **Calculations:** the worked example A/B/C/D/E, checked by hand.
+- **Real-file invariants:** root descendants = n − 1, root total = sum of salaries − root salary, and total = management + IC with non-leaf ≤ descendants for every node.
+- **`updateSalary`:** equals a full recompute.
+- **Bad data:** missing manager, several roots, reporting loops including self-loops, blank, junk and negative salaries, duplicate IDs, and an empty file.
+- **Edge cases:** a lone person, zero IC cost (null ratio), and placeholders not counted as people.
+- **Parsing:** CRLF line endings, quoted commas, extra columns, leading-zero IDs, blank lines, and a clear error for a wrong header.
+- **Formatting:** units, the $1000K rounding boundary, negatives and missing values.
 
 ## Performance (measured)
 
@@ -105,8 +135,14 @@ The 40,000-node tree is stored with `shallowRef`/`markRaw`, so Vue does not trac
 - **Same pipeline in Node:** parse 206 ms, build tree 63 ms, compute all figures 64 ms.
 - **Bundle:** 194 kB of JavaScript (70 kB gzipped).
 
-## At Dayforce scale
+## What I'd do next
 
+**With more time:**
+- **A what-if editor:** change a salary or move a person and watch every total update. `updateSalary` already does the O(depth) maths; it needs a UI.
+- **End-to-end tests (Playwright)** for search, expand, drill-down and upload. Today's tests cover the data layer only.
+- **A Web Worker for parsing,** so a much larger upload never blocks the page.
+
+**At Dayforce scale:**
 - **Incremental updates:** what-if edits (move a person, change a salary) update only the ancestors on that path in O(depth), using `updateSalary`.
 - **Server-side aggregation:** past a few hundred thousand people, parsing in the browser becomes the bottleneck. Compute roll-ups in Postgres with a recursive CTE (`WITH RECURSIVE`), or keep a stored aggregate table, and send only the visible slice.
 - **Caching:** keep computed results in memory per session, in IndexedDB across reloads and in a server cache. When a salary changes, only that path goes stale.

@@ -1,8 +1,3 @@
-# Downloaded libraries: huge, and anyone can rebuild them with npm install.
 node_modules
-# Build output from npm run build: generated, never edited by hand.
 dist
-# Hidden folder-settings files macOS creates automatically.
 .DS_Store
-# My personal study sheet: stays on my laptop, never uploaded.
-docs/CONCEPTS.md
