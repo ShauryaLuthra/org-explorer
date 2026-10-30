@@ -4,10 +4,12 @@
 export function formatMoney(value) {
   if (value === null || value === undefined) return '–'
   const size = Math.abs(value)
-  if (size >= 1e9) return `$${trim((value / 1e9).toFixed(2))}B`
-  if (size >= 1e6) return `$${trim((value / 1e6).toFixed(2))}M`
-  if (size >= 1e3) return `$${trim((value / 1e3).toFixed(1))}K`
-  return `$${Math.round(value)}`
+  const sign = value < 0 ? '-' : ''
+  // Each threshold sits where the smaller unit would round up to 1000, so 999,999 shows as $1M, not $1000K.
+  if (size >= 999.995e6) return `${sign}$${trim((size / 1e9).toFixed(2))}B`
+  if (size >= 999.95e3) return `${sign}$${trim((size / 1e6).toFixed(2))}M`
+  if (size >= 999.5) return `${sign}$${trim((size / 1e3).toFixed(1))}K`
+  return `${sign}$${Math.round(size)}`
 }
 
 // "92.0" -> "92", "1.20" -> "1.2"
