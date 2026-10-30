@@ -10,7 +10,7 @@ An interactive org chart and cost-analysis tool for Giga Corp's 40,000 employees
 ```bash
 npm install
 npm run dev     # app at http://localhost:5173 (Node 18+)
-npm test        # 27 tests (Vitest 4 needs Node 20+)
+npm test        # 29 tests (Vitest 4 needs Node 20+)
 npm run build   # production build in dist/
 ```
 
@@ -120,7 +120,7 @@ Each sum reuses the children's already-computed values, so every value is comput
 
 The 40,000-node tree is stored with `shallowRef`/`markRaw`, so Vue does not track every object. Only small UI state is reactive (the expanded set, search text, selection, tab and filter), and only expanded cards are rendered.
 
-**Tests (Vitest, 27 passing, in 4 files):**
+**Tests (Vitest, 29 passing, in 4 files):**
 - **Calculations:** the worked example A/B/C/D/E, checked by hand.
 - **Real-file invariants:** root descendants = n − 1, root total = sum of salaries − root salary, and total = management + IC with non-leaf ≤ descendants for every node.
 - **`updateSalary`:** equals a full recompute.
