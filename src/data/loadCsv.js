@@ -21,15 +21,20 @@ export function parseCsv(text) {
 }
 
 /**
- * Download the CSV file that ships with the app.
+ * Download and unzip the CSV that ships with the app.
+ * It is stored gzipped (12 MB -> 2.6 MB) because StackBlitz's GitHub import stalls on large files.
  * @returns {Promise<string>} The file's text, once the download finishes.
  */
 export async function fetchBundledCsv() {
   // BASE_URL keeps the path right when the app is hosted under a sub-path.
-  const url = `${import.meta.env.BASE_URL}data/giga-corp.csv`
+  const url = `${import.meta.env.BASE_URL}data/giga-corp.csv.gz`
   const response = await fetch(url)
   if (!response.ok) {
     throw new Error(`Could not load ${url} (HTTP ${response.status})`)
   }
-  return await response.text()
+  const bytes = new Uint8Array(await response.arrayBuffer())
+  // Some servers already undo the gzip for us, so only decompress if the gzip header (1f 8b) is still there.
+  const isGzip = bytes[0] === 0x1f && bytes[1] === 0x8b
+  const stream = new Blob([bytes]).stream()
+  return new Response(isGzip ? stream.pipeThrough(new DecompressionStream('gzip')) : stream).text()
 }

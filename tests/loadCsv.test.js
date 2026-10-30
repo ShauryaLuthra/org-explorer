@@ -1,7 +1,8 @@
 // Checks CSV parsing: real-world formatting (CRLF, quoted commas, extra columns) and a clear error for a wrong header.
 
-import { describe, it, expect } from 'vitest'
-import { parseCsv } from '../src/data/loadCsv.js'
+import { describe, it, expect, vi, afterEach } from 'vitest'
+import { gzipSync } from 'node:zlib'
+import { parseCsv, fetchBundledCsv } from '../src/data/loadCsv.js'
 import { COLUMNS } from '../src/data/columns.js'
 
 const HEADER = Object.values(COLUMNS).join(',')
@@ -22,5 +23,22 @@ describe('parseCsv', () => {
 
   it('skips blank lines', () => {
     expect(parseCsv(`${HEADER}\n\nE1,A,T,D,L,1,,1\n\n`).rows).toHaveLength(1)
+  })
+})
+
+describe('fetchBundledCsv', () => {
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('unzips the gzipped bundle, and passes through text a server already decoded', async () => {
+    const text = 'a,b\n1,2\n'
+    for (const body of [gzipSync(text), Buffer.from(text)]) {
+      vi.stubGlobal('fetch', async () => new Response(body))
+      expect(await fetchBundledCsv()).toBe(text)
+    }
+  })
+
+  it('reports a failed download with its status', async () => {
+    vi.stubGlobal('fetch', async () => new Response('', { status: 404 }))
+    await expect(fetchBundledCsv()).rejects.toThrow('HTTP 404')
   })
 })

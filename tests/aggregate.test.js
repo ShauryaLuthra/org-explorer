@@ -2,6 +2,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
+import { gunzipSync } from 'node:zlib'
 import { buildTree } from '../src/data/buildTree.js'
 import { aggregate, updateSalary } from '../src/data/aggregate.js'
 import { parseCsv } from '../src/data/loadCsv.js'
@@ -47,7 +48,7 @@ describe('aggregate: edge cases', () => {
 })
 
 describe('aggregate: bundled CSV', () => {
-  const { rows } = parseCsv(readFileSync('public/data/giga-corp.csv', 'utf8'))
+  const { rows } = parseCsv(gunzipSync(readFileSync('public/data/giga-corp.csv.gz')).toString('utf8'))
   const { root, byId } = buildTree(rows)
   const order = aggregate(root)
 

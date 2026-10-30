@@ -79,7 +79,7 @@ tests/                Vitest unit tests for the data layer, where the logic live
 
 ## Data
 
-This uses the official Giga Corp file supplied with the assessment (`public/data/giga-corp.csv`): 40,000 rows and 22 columns.
+This uses the official Giga Corp file supplied with the assessment: 40,000 rows and 22 columns. It ships gzipped as `public/data/giga-corp.csv.gz` (12 MB → 2.6 MB), because StackBlitz's GitHub import stalls on the full-size file. The browser unzips it on load with the built-in `DecompressionStream`, and `gunzip -k public/data/giga-corp.csv.gz` restores the original byte-for-byte.
 
 - **Columns used:** the app reads 8 of them (`Employee Id`, `Name`, `Job Title`, `Department`, `Location`, `level`, `Manager`, `Salary`).
 - **One mapping file:** all header names live in `src/data/columns.js`, so a different header is a one-file change.
