@@ -12,8 +12,7 @@ const HEIGHT = 460
 const focus = shallowRef(org.value.root)
 watch(() => org.value, (value) => { focus.value = value.root }) // A new upload resets the drill-down.
 
-// Bottom-up sweep (as in aggregate) so a team's cost includes its leader's salary and respects the department
-// filter.
+// Bottom-up sweep (as in aggregate): a team's cost includes its leader's salary and respects the filter.
 const teamCost = computed(() => {
   const cost = new Map()
   const { order } = org.value

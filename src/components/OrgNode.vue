@@ -3,7 +3,7 @@
 import { computed } from 'vue'
 import PersonCard from './PersonCard.vue'
 import MoreCard from './MoreCard.vue'
-import { useOrg } from '../composables/useOrg.js'
+import { useOrg, MORE_CHILDREN } from '../composables/useOrg.js'
 
 const props = defineProps({ person: { type: Object, required: true } })
 const { expanded, highlightedId, toggle, visibleCount, showMore, select } = useOrg()
@@ -19,7 +19,7 @@ const remaining = computed(() => props.person.children.length - shownChildren.va
     <!-- Only expanded nodes render children, so the page holds dozens of cards, not 40,000. -->
     <ul v-if="isOpen && person.children.length > 0">
       <OrgNode v-for="child in shownChildren" :key="child.id" :person="child" />
-      <li v-if="remaining > 0"><MoreCard :remaining="remaining" :step="24" @more="showMore(person.id)" /></li>
+      <li v-if="remaining > 0"><MoreCard :remaining="remaining" :step="MORE_CHILDREN" @more="showMore(person.id)" /></li>
     </ul>
   </li>
 </template>

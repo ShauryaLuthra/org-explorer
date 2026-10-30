@@ -4,7 +4,7 @@ import { computed, watch, ref, nextTick } from 'vue'
 import MoreCard from './MoreCard.vue'
 import { formatMoney, formatCount } from '../data/format.js'
 import { departmentColor } from '../data/departmentColors.js'
-import { useOrg } from '../composables/useOrg.js'
+import { useOrg, MORE_CHILDREN } from '../composables/useOrg.js'
 
 const props = defineProps({ person: { type: Object, required: true }, depth: { type: Number, default: 0 } })
 const { expanded, highlightedId, toggle, visibleCount, showMore, select } = useOrg()
@@ -42,7 +42,7 @@ watch(highlightedId, async (id) => {
     </div>
     <ul v-if="isOpen && person.children.length > 0">
       <OrgList v-for="child in shownChildren" :key="child.id" :person="child" :depth="depth + 1" />
-      <li v-if="remaining > 0" class="py-2" :style="{ paddingLeft: `${12 + (depth + 1) * 16}px` }"><MoreCard :remaining="remaining" :step="24" @more="showMore(person.id)" /></li>
+      <li v-if="remaining > 0" class="py-2" :style="{ paddingLeft: `${12 + (depth + 1) * 16}px` }"><MoreCard :remaining="remaining" :step="MORE_CHILDREN" @more="showMore(person.id)" /></li>
     </ul>
   </li>
 </template>

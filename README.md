@@ -133,7 +133,7 @@ The 40,000-node tree is stored with `shallowRef`/`markRaw`, so Vue does not trac
 
 - **In the browser:** "Loaded 40,000 people in 0.23 s" in Chrome on a MacBook. The footer shows the time on every load, and the console logs the breakdown.
 - **Same pipeline in Node:** parse 206 ms, build tree 63 ms, compute all figures 64 ms.
-- **Bundle:** 194 kB of JavaScript (70 kB gzipped).
+- **Bundle:** 195 kB of JavaScript (70 kB gzipped).
 
 ## What I'd do next
 

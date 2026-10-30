@@ -25,8 +25,7 @@ const x = computed(() => scaleLinear().domain([0, rows.value[0]?.total ?? 1]).ra
 const title = computed(() => {
   const top = rows.value[0]
   if (!top) return 'No people in this view'
-  // With one department selected, a share-of-total headline would always say 100%, so show its management
-  // share instead.
+  // With one department selected, a share-of-total headline would always say 100%, so show its management share.
   if (rows.value.length === 1) return `${top.name}: ${((top.mgmt / top.total) * 100).toFixed(0)}% of its ${formatMoney(top.total)} salary cost goes to managers`
   return `${top.name} carries ${((top.total / grandTotal.value) * 100).toFixed(0)}% of all salary cost (${formatMoney(top.total)})`
 })

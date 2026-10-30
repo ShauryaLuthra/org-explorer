@@ -1,5 +1,4 @@
-// Shared app state: loads the CSV, builds and aggregates the tree, and holds the small UI state every view
-// uses.
+// Shared app state: loads the CSV, builds and aggregates the tree, and holds the UI state every view uses.
 
 import { shallowRef, ref, reactive, markRaw } from 'vue'
 import { fetchBundledCsv, parseCsv } from '../data/loadCsv.js'
@@ -9,7 +8,7 @@ import { assignDepartmentColors } from '../data/departmentColors.js'
 
 // Wide teams are paged so a manager with hundreds of reports never mounts hundreds of cards at once.
 const FIRST_CHILDREN = 12
-const MORE_CHILDREN = 24
+export const MORE_CHILDREN = 24
 
 // The 40k-person tree is a shallowRef of markRaw objects so Vue doesn't deep-track it. Only the small UI
 // state below is reactive.

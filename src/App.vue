@@ -1,6 +1,6 @@
 <!-- Page frame: header, the active tab, and a footer with the load time. Loads the bundled CSV on start. -->
 <script setup>
-import { onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import AppHeader from './components/AppHeader.vue'
 import OrgChartView from './views/OrgChartView.vue'
 import CostAnalysisView from './views/CostAnalysisView.vue'
@@ -9,6 +9,8 @@ import { useOrg } from './composables/useOrg.js'
 
 const { org, status, errorMessage, timings, activeTab, loadBundled } = useOrg()
 onMounted(loadBundled)
+// Placeholder nodes (Unassigned, Giga Corp) aren't people.
+const headcount = computed(() => org.value.order.filter((p) => !p.synthetic).length)
 </script>
 
 <template>
@@ -27,7 +29,7 @@ onMounted(loadBundled)
       </template>
     </main>
     <footer v-if="status === 'ready'" class="border-t border-slate-200 bg-white px-6 py-2 text-xs text-slate-500">
-      Loaded {{ formatCount(org.order.length) }} people in {{ (timings.total / 1000).toFixed(2) }} s
+      Loaded {{ formatCount(headcount) }} people in {{ (timings.total / 1000).toFixed(2) }} s
     </footer>
   </div>
 </template>

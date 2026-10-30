@@ -7,8 +7,7 @@
  * @returns {Object[]} Everyone in top-down (breadth-first) order, reused later by the cost charts.
  */
 export function aggregate(root) {
-  // Breadth-first walk with an index pointer (Array.shift is O(n)). Every parent lands in `order` before its
-  // children.
+  // Breadth-first walk with an index pointer (Array.shift is O(n)), so every parent lands in `order` first.
   const order = [root]
   root.depth = 0
   for (let i = 0; i < order.length; i++) {

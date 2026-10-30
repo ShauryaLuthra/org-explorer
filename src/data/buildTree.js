@@ -1,5 +1,4 @@
-// Turns the flat list of CSV rows into a tree of people, each linked to their manager and their direct
-// reports.
+// Turns the flat list of CSV rows into a tree of people, each linked to their manager and direct reports.
 
 import { COLUMNS } from './columns.js'
 
@@ -24,8 +23,7 @@ function createPerson(fields) {
   }
 }
 
-// Accepts "$92,000"-style text. A blank or invalid salary becomes 0 and is reported, so one bad cell never
-// drops a person.
+// Accepts "$92,000"-style text. A blank or invalid salary becomes 0 and is reported, so no row is dropped.
 function parseSalary(raw, id, issues) {
   const cleaned = raw.replaceAll('$', '').replaceAll(',', '').trim()
   const value = Number(cleaned)
@@ -129,8 +127,7 @@ export function buildTree(rows) {
 
   if (tops.length === 0) throw new Error('No people found in the CSV')
 
-  // Several tops (multiple CEOs, or the CEO plus Unassigned) get one synthetic root, so the tree has a single
-  // top.
+  // Several tops (multiple CEOs, or the CEO plus Unassigned) go under one synthetic root.
   let root = tops[0]
   if (tops.length > 1) {
     root = createSynthetic(COMPANY_ROOT_ID, 'Giga Corp', 'Company')
