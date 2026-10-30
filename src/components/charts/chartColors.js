@@ -1,4 +1,4 @@
-// chartColors.js: the two series colours used by every cost chart. Checked with a colour-blindness/contrast validator (all checks pass).
+// Series colours shared by every cost chart (checked for colour-blind safety and contrast).
 
-export const MGMT_COLOUR = '#2a78d6' // Blue = management cost (managers' salaries).
-export const IC_COLOUR = '#eb6834' // Orange = individual-contributor cost.
+export const MGMT_COLOUR = '#2a78d6'
+export const IC_COLOUR = '#eb6834'
