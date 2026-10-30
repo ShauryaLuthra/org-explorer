@@ -55,11 +55,12 @@ async function load(getText) {
     const searchTexts = order.map((p) => `${p.name} ${p.title}`.toLowerCase())
     org.value = { root, byId, order, issues, parseErrors: errors, searchTexts }
     timings.value = { read: t1 - t0, parse: t2 - t1, build: t3 - t2, aggregate: t4 - t3, total: t4 - t0 }
-    console.info('[Org Explorer] timings (ms):', timings.value)
+    console.info('[Org Explorer] timings (ms):', { ...timings.value })
     resetView()
     status.value = 'ready'
   } catch (error) {
-    status.value = 'error'
+    // A failed upload keeps the data already on screen; only a failed first load shows the error page.
+    status.value = org.value ? 'ready' : 'error'
     errorMessage.value = error.message
   }
 }
